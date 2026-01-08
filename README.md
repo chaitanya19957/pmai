@@ -46,30 +46,34 @@ PMAI turns this fragmented work into a **repeatable, composable system** where:
 
 ## Repository Structure
 
+## Repository Structure
+
+```text
 pmai/
-├── context/ # How I work
-│ ├── templates/ # Output structure (PRDs, stories, release notes)
-│ └── standards.md # Writing standards, preferences, voice
+├── context/                     # How I work
+│   ├── templates/               # Output structure (PRDs, stories, release notes)
+│   └── standards.md             # Writing standards, preferences, voice
 │
-├── skills/ # Atomic capabilities (verbs)
-│ ├── summarize_discovery.md
-│ ├── generate_prd.md
-│ └── break_into_stories.md
+├── skills/                      # Atomic capabilities (verbs)
+│   ├── summarize_discovery.md
+│   ├── generate_prd.md
+│   └── break_into_stories.md
 │
-├── workflows/ # Orchestration (process)
-│ ├── 01_discovery_to_prd.md
-│ └── 02_prd_to_stories.md
+├── workflows/                   # Orchestration (process)
+│   ├── 01_discovery_to_prd.md
+│   └── 02_prd_to_stories.md
 │
-├── history/ # Long-term memory
-│ ├── decisions/
-│ ├── learnings/
-│ └── projects/
+├── history/                     # Long-term memory
+│   ├── decisions/
+│   ├── learnings/
+│   └── projects/
 │
-├── automations/ # Hooks & triggers (optional / later)
-│ ├── hooks/
-│ └── scripts/
+├── automations/                 # Hooks & triggers (optional / later)
+│   ├── hooks/
+│   └── scripts/
 │
-└── demos/ # Repeatable demo inputs & outputs
+└── demos/                       # Repeatable demo inputs & outputs
+
 
 
 ---
