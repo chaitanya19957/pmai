@@ -1,24 +1,22 @@
 # Workflow: PRD → Stories
 
 ## Purpose
-Break an approved PRD into Jira-ready stories.
+Convert an approved PRD into implementation-ready stories.
 
 ## Inputs
-- PRD document
+- project_id
+- prd_markdown (or history path)
 
-## Steps
-1. Identify epics
-2. Break epics into stories
-3. Add acceptance criteria
-4. Identify dependencies
-5. Add analytics requirements
+## Steps (Orchestration)
+1) Skill: skills/delivery/break_into_stories
+2) Skill: skills/publishing/write_to_history
+   - Write outputs to: history/projects/<project_id>/stories/stories.md
+3) (Optional) Append key decisions to: history/projects/<project_id>/decisions.md
 
-## Templates Used
-- context/templates/story.template.md
-
-## Outputs
-- Stories saved to history/projects/{{feature_name}}/stories.md
+## Outputs (History)
+- history/projects/<project_id>/stories/stories.md
+- history/projects/<project_id>/decisions.md (optional)
 
 ## Rules
-- Keep stories small
-- Assume 2-week sprint
+- Stories must be independently valuable
+- If requirements are unclear: create open questions instead of guessing

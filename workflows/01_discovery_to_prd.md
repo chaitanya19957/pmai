@@ -1,25 +1,26 @@
 # Workflow: Discovery → PRD
 
 ## Purpose
-Turn messy discovery notes into a structured PRD.
+Turn messy discovery notes into a structured PRD artifact.
 
 ## Inputs
-- Interview notes (markdown or text)
-- Feature name
+- project_id
+- feature_name
+- discovery_notes (text/markdown)
 
-## Steps
-1. Summarize the main user problems
-2. Identify target users/personas
-3. Extract goals and success metrics
-4. Identify risks and unknowns
-5. Generate a PRD using the PRD template
+## Steps (Orchestration)
+1) Skill: skills/publishing/write_to_history
+   - Write inputs to: history/projects/<project_id>/inputs/discovery_notes.md
+2) Skill: skills/discovery/summarize_discovery
+3) Skill: skills/prd/generate_prd
+4) (Optional) Append key decisions to: history/projects/<project_id>/decisions.md
 
-## Templates Used
-- context/templates/prd.template.md
-
-## Outputs
-- PRD saved to history/projects/{{feature_name}}/prd.md
+## Outputs (History)
+- history/projects/<project_id>/inputs/discovery_notes.md
+- history/projects/<project_id>/artifacts/discovery_summary.md
+- history/projects/<project_id>/prd/prd.md
+- history/projects/<project_id>/decisions.md (optional)
 
 ## Rules
 - Use simple English
-- If something is unclear, list assumptions
+- If unclear: record assumptions + open questions (don’t guess)

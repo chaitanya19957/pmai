@@ -46,6 +46,8 @@ PMAI turns this fragmented work into a **repeatable, composable system** where:
 
 ## Repository Structure
 
+## Repository Structure
+
 ```text
 pmai/
 ├── context/                     # How I work
@@ -71,7 +73,6 @@ pmai/
 │   └── scripts/
 │
 └── demos/                       # Repeatable demo inputs & outputs
-
 
 
 ---
