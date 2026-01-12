@@ -1,3 +1,5 @@
+```text
+
 # PMAI — Personal Product Management AI (Claude Code)
 
 PMAI is a **Personal Product Management Operating System** that turns PM work into reusable infrastructure.
