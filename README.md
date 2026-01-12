@@ -1,226 +1,204 @@
 # PMAI — Personal Product Management AI (Claude Code)
 
-PMAI is a **Personal AI Infrastructure for Product Managers**, built using **Claude Code**.
+PMAI is a **Personal Product Management Operating System** that turns PM work into reusable infrastructure.
 
-It encodes how I work across the **entire Product SDLC** using **Context, Skills, Workflows, History, and Automation**.
+Instead of ad-hoc prompts, this repo encodes:
+- **How product work is done**
+- **What gets produced**
+- **What decisions were made**
+- **How tools get invoked**
 
-This is **not a chatbot**.  
-This is an **operating system for PM work**.
-
----
-
-## Core Mental Model
-
-Context → How I work
-Skills → What I can do
-Workflows → How work is orchestrated
-History → What the system remembers
-Automation → When the system acts
-
-
-> I don’t prompt Claude.  
-> I run workflows.  
-> Workflows call skills.  
-> Skills follow context.  
-> Outputs go into history.
+This is a **Claude Code–first PM agent**, designed to move from reactive chat → structured execution → tool-driven automation.
 
 ---
 
-## Why PMAI Exists
+## Mental Model
 
-Product work is fragmented across:
-- Documents
-- Tickets
-- Meetings
-- Slack messages
-- Releases
-- Post-launch learnings
+This system follows four layers:
 
-PMAI turns this fragmented work into a **repeatable, composable system** where:
-- Outputs are consistent
-- Decisions are remembered
-- Processes are reusable
-- Learning compounds over time
+1. **Skills** — how work is executed
+2. **Context** — standards, voice, and templates
+3. **History** — durable memory of decisions and outputs
+4. **Automation / Tools** — integrations and triggers
+
+Everything is versioned, inspectable, and repeatable.
 
 ---
 
 ## Repository Structure
 
-## Repository Structure
+### `context/` — How the PM thinks and writes
+Persistent standards that shape every output.
 
-```text
-pmai/
-├── context/                     # How I work
-│   ├── templates/               # Output structure (PRDs, stories, release notes)
-│   └── standards.md             # Writing standards, preferences, voice
-│
-├── skills/                      # Atomic capabilities (verbs)
-│   ├── summarize_discovery.md
-│   ├── generate_prd.md
-│   └── break_into_stories.md
-│
-├── workflows/                   # Orchestration (process)
-│   ├── 01_discovery_to_prd.md
-│   └── 02_prd_to_stories.md
-│
-├── history/                     # Long-term memory
-│   ├── decisions/
-│   ├── learnings/
-│   └── projects/
-│
-├── automations/                 # Hooks & triggers (optional / later)
-│   ├── hooks/
-│   └── scripts/
-│
-└── demos/                       # Repeatable demo inputs & outputs
+context/
+├── preferences/
+│ └── voice.md # Writing tone, verbosity, style
+├── standards/
+│ └── writing.md # Formatting rules, conventions
+└── templates/
+├── prd.template.md # Canonical PRD structure
+└── story.template.md # Canonical user story structure
 
-
----
-
-## Context — How I Work
-
-Context defines **constraints**, not actions.
-
-It includes:
-- Templates (PRD, stories, release notes)
-- Writing standards
-- Preferences
-- Voice
-
-Context is:
-- Persistent
-- Always loaded
-- Never executed
-
-Example:
-> “Whenever a PRD is created, it must follow this structure.”
-
-Templates **belong in context**, not skills.
-
----
-
-## Skills — What I Can Do
-
-Skills are **atomic, reusable capabilities**.
-
-Examples:
-- Summarize discovery notes
-- Generate a PRD
-- Break a PRD into stories
-- Draft release notes
-
-Rules:
-- One responsibility per skill
-- No orchestration logic
-- No automation triggers
-- Reusable across workflows
-
-Skills answer:
-> “What can the system do?”
-
----
-
-## Workflows — How Work Is Done
-
-Workflows define **process and order**.
-
-Example: **Discovery → PRD**
-
-Summarize discovery notes
-
-Identify users, problems, and goals
-
-Generate PRD using template
-
-Save artifact
-
-Log decisions
-
-
-Workflows:
-- Orchestrate multiple skills
-- Reference context (templates, standards)
-- Write outputs to history
-
-Workflows answer:
-> “In what order should skills be run to complete a task?”
-
----
-
-## History — What the System Remembers
-
-History is **long-term memory** that compounds value.
-
-It stores:
-- Decisions and rationale
-- Patterns
-- Learnings
-- Project artifacts
-
-History is:
-- Append-only
-- Never overwritten
-- Used to improve future execution
-
----
-
-## Automation — When the System Acts (Optional)
-
-Automation answers:
-> “When should the system act without me asking?”
-
-Examples:
-- Calendar event → run discovery workflow
-- PR merged → run release workflow
-- Jira status change → generate update
-
-Important:
-- Automation triggers **workflows**
-- Automation does **not** trigger skills directly
-
----
-
-## Example: Discovery → PRD Flow
-
-Interview Notes
-↓
-Skill: summarize_discovery
-↓
-Structured Insights
-↓
-Skill: generate_prd
-↓ (uses PRD template)
-PRD.md
-
-csharp
+yaml
 Copy code
 
-Wrapped by:
-Workflow: Discovery → PRD
+**Rule:** Context never contains project-specific data.
 
-css
+---
+
+### `skills/` — Atomic execution units
+Skills are **single-purpose, composable instructions** used by workflows.
+
+skills/
+├── discovery/
+│ └── summarize_discovery.md
+├── prd/
+│ └── generate_prd.md
+├── delivery/
+│ └── break_into_stories.md
+├── validation/
+│ └── validate_prd_readiness.md
+└── publishing/
+└── write_to_history.md
+
+yaml
 Copy code
 
-Saved to:
-history/projects/<feature>/prd.md
-
-
----
-
-## Design Rules (Non-Negotiable)
-
-- Templates belong in **Context**
-- Skills must be **atomic**
-- Workflows must be **explicit**
-- History must be **persistent**
-- Automation must be **predictable**
+**Rule:**  
+- Skills do not know about tools  
+- Skills do not manage sequencing  
+- Skills produce deterministic outputs  
 
 ---
 
-## Guiding Principle
+### `workflows/` — End-to-end product flows
+Workflows define **when** and **in what order** skills are executed.
 
-**Structure beats prompts.  
-Systems beat memory.  
-Workflows beat heroics.**
+workflows/
+├── _shared/
+│ └── workflow_contract.md # Input/output expectations
+└── (future workflows)
 
-This repository is designed to scale **how I think**, not just how fast I type.
+yaml
+Copy code
+
+Examples of workflows:
+- Discovery → PRD
+- PRD → Validation → Stories
+- Intake → PRD → Jira publish → Slack notify
+
+---
+
+### `history/` — System memory (the most important folder)
+Everything the system learns is stored here.
+
+history/
+├── decisions/ # Cross-project architectural or product decisions
+├── learnings/ # Retrospective insights
+├── patterns/ # Reusable heuristics discovered over time
+└── projects/
+├── calorie-tracker/
+│ ├── inputs/ # Intake requests, discovery notes
+│ ├── prd/ # Generated PRDs
+│ ├── stories/ # Story breakdowns
+│ ├── artifacts/ # Readiness checks, summaries
+│ └── decisions.md # Project-specific decisions
+├── demo-intake-form/
+└── demo-intake-form-run2/
+
+yaml
+Copy code
+
+**Rule:**  
+History is append-only.  
+This is how the PM agent improves over time.
+
+---
+
+### `tools/` — External system contracts
+Tool definitions describe **how the PM agent talks to systems**.
+
+tools/
+├── _shared/
+│ ├── canonical_models.md # Common data shapes
+│ └── tool_contract.template.md # Standard tool interface
+├── jira/
+│ └── tool.md # Jira create/update contract
+└── slack/
+└── tool.md # Slack notification contract
+
+yaml
+Copy code
+
+**Rule:**  
+Tools define **capabilities**, not execution logic.
+
+---
+
+### `automations/` — Triggers and runners
+This layer connects the system to the outside world.
+
+automations/
+├── scripts/ # Runners (CLI, cron, CI, etc.)
+└── triggers/ # Event definitions (future: webhooks, schedules)
+
+yaml
+Copy code
+
+Today: manual execution via Claude Code  
+Next: event-driven execution (Jira, Slack, GitHub, Calendar)
+
+---
+
+## How PMAI Is Used (Today)
+
+1. Create a project intake under:
+history/projects/<project>/inputs/
+
+markdown
+Copy code
+
+2. Run workflows manually in Claude Code:
+- Summarize discovery
+- Generate PRD
+- Validate readiness
+- Break into stories
+
+3. Outputs are written to:
+history/projects/<project>/
+
+yaml
+Copy code
+
+4. Decisions and learnings are committed to Git.
+
+---
+
+## Design Principles
+
+- **Systems > prompts**
+- **Templates > free-form writing**
+- **Workflows > manual sequencing**
+- **History > memory in chat**
+- **Claude Code is the executor**
+
+---
+
+## Roadmap
+
+- [ ] Formalize core workflows
+- [ ] Jira tool execution
+- [ ] Slack notifications
+- [ ] Intake via form / webhook
+- [ ] Weekly retros auto-capture
+- [ ] Pattern extraction across projects
+
+---
+
+## Status
+
+✅ Folder structure stabilized  
+✅ Intake flows tested  
+🔄 Tool integration in progress  
+
+This repo is the foundation for a persistent PM agent.
