@@ -48,7 +48,6 @@ context/
 ### `skills/` — Atomic execution units
 Skills are **single-purpose, composable instructions** used by workflows.
 
-```text
 skills/
 ├── discovery/
 │ └── summarize_discovery.md
