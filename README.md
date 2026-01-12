@@ -30,7 +30,6 @@ Everything is versioned, inspectable, and repeatable.
 ### `context/` — How the PM thinks and writes
 Persistent standards that shape every output.
 
-```text
 context/
 ├── preferences/
 │ └── voice.md # Writing tone, verbosity, style
