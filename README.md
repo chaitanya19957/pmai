@@ -1,5 +1,3 @@
-```text
-
 # PMAI — Personal Product Management AI (Claude Code)
 
 PMAI is a **Personal Product Management Operating System** that turns PM work into reusable infrastructure.
@@ -32,15 +30,16 @@ Everything is versioned, inspectable, and repeatable.
 ### `context/` — How the PM thinks and writes
 Persistent standards that shape every output.
 
+```
 context/
 ├── preferences/
 │ └── voice.md # Writing tone, verbosity, style
 ├── standards/
 │ └── writing.md # Formatting rules, conventions
 └── templates/
-├── prd.template.md # Canonical PRD structure
-└── story.template.md # Canonical user story structure
-´´´
+  ├── prd.template.md # Canonical PRD structure
+  └── story.template.md # Canonical user story structure
+```
 **Rule:** Context never contains project-specific data.
 
 ---
@@ -48,6 +47,7 @@ context/
 ### `skills/` — Atomic execution units
 Skills are **single-purpose, composable instructions** used by workflows.
 
+```
 skills/
 ├── discovery/
 │ └── summarize_discovery.md
@@ -58,7 +58,8 @@ skills/
 ├── validation/
 │ └── validate_prd_readiness.md
 └── publishing/
-└── write_to_history.md
+  └── write_to_history.md
+```
 
 
 **Rule:**  
@@ -71,10 +72,12 @@ skills/
 ### `workflows/` — End-to-end product flows
 Workflows define **when** and **in what order** skills are executed.
 
+```
 workflows/
 ├── _shared/
 │ └── workflow_contract.md # Input/output expectations
 └── (future workflows)
+```
 
 
 Examples of workflows:
@@ -87,19 +90,21 @@ Examples of workflows:
 ### `history/` — System memory (the most important folder)
 Everything the system learns is stored here.
 
+```
 history/
 ├── decisions/ # Cross-project architectural or product decisions
 ├── learnings/ # Retrospective insights
 ├── patterns/ # Reusable heuristics discovered over time
 └── projects/
-├── calorie-tracker/
-│ ├── inputs/ # Intake requests, discovery notes
-│ ├── prd/ # Generated PRDs
-│ ├── stories/ # Story breakdowns
-│ ├── artifacts/ # Readiness checks, summaries
-│ └── decisions.md # Project-specific decisions
-├── demo-intake-form/
-└── demo-intake-form-run2/
+  ├── calorie-tracker/
+  │ ├── inputs/ # Intake requests, discovery notes
+  │ ├── prd/ # Generated PRDs
+  │ ├── stories/ # Story breakdowns
+  │ ├── artifacts/ # Readiness checks, summaries
+  │ └── decisions.md # Project-specific decisions
+  ├── demo-intake-form/
+  └── demo-intake-form-run2/
+```
 
 
 **Rule:**  
@@ -111,6 +116,7 @@ This is how the PM agent improves over time.
 ### `tools/` — External system contracts
 Tool definitions describe **how the PM agent talks to systems**.
 
+```
 tools/
 ├── _shared/
 │ ├── canonical_models.md # Common data shapes
@@ -118,7 +124,8 @@ tools/
 ├── jira/
 │ └── tool.md # Jira create/update contract
 └── slack/
-└── tool.md # Slack notification contract
+  └── tool.md # Slack notification contract
+```
 
 
 **Rule:**  
@@ -129,9 +136,11 @@ Tools define **capabilities**, not execution logic.
 ### `automations/` — Triggers and runners
 This layer connects the system to the outside world.
 
+```
 automations/
 ├── scripts/ # Runners (CLI, cron, CI, etc.)
 └── triggers/ # Event definitions (future: webhooks, schedules)
+```
 
 
 Today: manual execution via Claude Code  
@@ -142,19 +151,20 @@ Next: event-driven execution (Jira, Slack, GitHub, Calendar)
 ## How PMAI Is Used (Today)
 
 1. Create a project intake under:
-history/projects/<project>/inputs/
-
-markdown
-Copy code
+   ```
+   history/projects/<project>/inputs/
+   ```
 
 2. Run workflows manually in Claude Code:
-- Summarize discovery
-- Generate PRD
-- Validate readiness
-- Break into stories
+   - Summarize discovery
+   - Generate PRD
+   - Validate readiness
+   - Break into stories
 
 3. Outputs are written to:
-history/projects/<project>/
+   ```
+   history/projects/<project>/
+   ```
 
 
 
