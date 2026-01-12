@@ -39,8 +39,6 @@ context/
 ├── prd.template.md # Canonical PRD structure
 └── story.template.md # Canonical user story structure
 
-yaml
-Copy code
 
 **Rule:** Context never contains project-specific data.
 
@@ -61,8 +59,6 @@ skills/
 └── publishing/
 └── write_to_history.md
 
-yaml
-Copy code
 
 **Rule:**  
 - Skills do not know about tools  
@@ -79,8 +75,6 @@ workflows/
 │ └── workflow_contract.md # Input/output expectations
 └── (future workflows)
 
-yaml
-Copy code
 
 Examples of workflows:
 - Discovery → PRD
@@ -106,8 +100,6 @@ history/
 ├── demo-intake-form/
 └── demo-intake-form-run2/
 
-yaml
-Copy code
 
 **Rule:**  
 History is append-only.  
@@ -127,8 +119,6 @@ tools/
 └── slack/
 └── tool.md # Slack notification contract
 
-yaml
-Copy code
 
 **Rule:**  
 Tools define **capabilities**, not execution logic.
@@ -142,8 +132,6 @@ automations/
 ├── scripts/ # Runners (CLI, cron, CI, etc.)
 └── triggers/ # Event definitions (future: webhooks, schedules)
 
-yaml
-Copy code
 
 Today: manual execution via Claude Code  
 Next: event-driven execution (Jira, Slack, GitHub, Calendar)
@@ -167,8 +155,7 @@ Copy code
 3. Outputs are written to:
 history/projects/<project>/
 
-yaml
-Copy code
+
 
 4. Decisions and learnings are committed to Git.
 
