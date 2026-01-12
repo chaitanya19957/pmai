@@ -14,12 +14,33 @@ This is a **Claude Code–first PM agent**, designed to move from reactive chat 
 
 ## Mental Model
 
-This system follows four layers:
+This system follows six components with clear responsibilities:
 
-1. **Skills** — how work is executed
-2. **Context** — standards, voice, and templates
-3. **History** — durable memory of decisions and outputs
-4. **Automation / Tools** — integrations and triggers
+| Component | Role | Key Rule |
+|-----------|------|----------|
+| **Context** | Constrains | Always loaded, never executed |
+| **Workflows** | Orchestrate | Define order + gates, never do work |
+| **Skills** | Execute | Atomic capabilities, invoke tools via MCP |
+| **Tools** | Integrate | MCP contracts for external I/O |
+| **History** | Remember | Append-only system memory |
+| **Automations** | Trigger | Decide *when*, not *how* |
+
+**Claude Code is the executor** — it loads context, runs workflows, executes skills, and invokes MCP tools.
+
+### Dependency Rules
+
+```
+Automations → Workflows → Skills → Tools
+                ↓           ↓
+              Context    History
+```
+
+- **Workflows** MAY call Skills
+- **Skills** MAY read Context
+- **Skills** MAY invoke Tools (via MCP)
+- **Skills** MUST write outputs to History
+- **Workflows** MUST NOT call Tools directly
+- **Automations** MUST NOT call Skills or Tools directly (only Workflows)
 
 Everything is versioned, inspectable, and repeatable.
 
@@ -60,26 +81,33 @@ skills/
 └── write_to_history.md
 
 
-**Rule:**  
-- Skills do not know about tools  
-- Skills do not manage sequencing  
-- Skills produce deterministic outputs  
+**Rule:**
+- Skills MAY invoke tools via MCP (e.g., create Jira issue, post to Slack)
+- Skills do not manage sequencing (workflows do)
+- Skills MUST write outputs to History
+- One skill = one job  
 
 ---
 
 ### `workflows/` — End-to-end product flows
-Workflows define **when** and **in what order** skills are executed.
+Workflows orchestrate skills — they define **order, branching, and gates**, but never do the work themselves.
 
 workflows/
 ├── _shared/
 │ └── workflow_contract.md # Input/output expectations
-└── (future workflows)
+├── 01_discovery_to_prd.md # Discovery notes → PRD
+└── 02_prd_to_stories.md # PRD → Validated stories
 
+
+**Rule:**
+- Workflows call Skills (never Tools directly)
+- Define the process: order, branching, retries, gates
+- Own sequencing; delegate execution to skills
 
 Examples of workflows:
 - Discovery → PRD
 - PRD → Validation → Stories
-- Intake → PRD → Jira publish → Slack notify
+- Intake → PRD → Publish to Jira → Notify via Slack
 
 ---
 
@@ -107,8 +135,8 @@ This is how the PM agent improves over time.
 
 ---
 
-### `tools/` — External system contracts
-Tool definitions describe **how the PM agent talks to systems**.
+### `tools/` — MCP contracts for external systems
+Tool definitions describe **how to talk to Jira, Slack, etc.** via MCP.
 
 tools/
 ├── _shared/
@@ -120,20 +148,27 @@ tools/
 └── tool.md # Slack notification contract
 
 
-**Rule:**  
-Tools define **capabilities**, not execution logic.
+**Rule:**
+- Tools define **capabilities**, not execution logic
+- No sequencing, no decisions — just contracts
+- Skills invoke tools; workflows and automations do not
 
 ---
 
 ### `automations/` — Triggers and runners
-This layer connects the system to the outside world.
+This layer connects the system to the outside world. Automations decide **when** work happens, not **how**.
 
 automations/
 ├── scripts/ # Runners (CLI, cron, CI, etc.)
 └── triggers/ # Event definitions (future: webhooks, schedules)
 
 
-Today: manual execution via Claude Code  
+**Rule:**
+- Automations trigger **Workflows only** — never Skills or Tools directly
+- No business logic — just event routing
+- Normalize external events into workflow inputs
+
+Today: manual execution via Claude Code
 Next: event-driven execution (Jira, Slack, GitHub, Calendar)
 
 ---

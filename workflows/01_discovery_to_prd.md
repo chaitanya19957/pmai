@@ -14,12 +14,19 @@ Turn messy discovery notes into a structured PRD artifact.
 2) Skill: skills/discovery/summarize_discovery
 3) Skill: skills/prd/generate_prd
 4) (Optional) Append key decisions to: history/projects/<project_id>/decisions.md
+5) Skill: skills/publishing/notify_slack
+   - project_id: <project_id>
+   - workflow_name: "discovery_to_prd"
+   - status: SUCCESS
+   - summary: "PRD generated for {feature_name}"
+   - artifacts: [discovery_summary.md, prd.md]
 
 ## Outputs (History)
 - history/projects/<project_id>/inputs/discovery_notes.md
 - history/projects/<project_id>/artifacts/discovery_summary.md
 - history/projects/<project_id>/prd/prd.md
 - history/projects/<project_id>/decisions.md (optional)
+- history/projects/<project_id>/artifacts/notifications.md (via notify_slack)
 
 ## Rules
 - Use simple English

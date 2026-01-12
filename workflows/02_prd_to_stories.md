@@ -15,11 +15,18 @@ Convert an approved PRD into implementation-ready stories.
 3) Skill: skills/publishing/write_to_history
    - Write outputs to: history/projects/<project_id>/stories/stories.md
 4) (Optional) Append key decisions to: history/projects/<project_id>/decisions.md
+5) Skill: skills/publishing/notify_slack
+   - project_id: <project_id>
+   - workflow_name: "prd_to_stories"
+   - status: SUCCESS
+   - summary: "Stories generated from PRD"
+   - artifacts: [prd_readiness.md, stories.md]
 
 ## Outputs (History)
 - history/projects/<project_id>/artifacts/prd_readiness.md
 - history/projects/<project_id>/stories/stories.md
 - history/projects/<project_id>/decisions.md (optional)
+- history/projects/<project_id>/artifacts/notifications.md (via notify_slack)
 
 ## Rules
 - Stories must be independently valuable
