@@ -30,6 +30,7 @@ Everything is versioned, inspectable, and repeatable.
 ### `context/` — How the PM thinks and writes
 Persistent standards that shape every output.
 
+```text
 context/
 ├── preferences/
 │ └── voice.md # Writing tone, verbosity, style
@@ -38,8 +39,7 @@ context/
 └── templates/
 ├── prd.template.md # Canonical PRD structure
 └── story.template.md # Canonical user story structure
-
-
+´´´
 **Rule:** Context never contains project-specific data.
 
 ---
@@ -47,6 +47,7 @@ context/
 ### `skills/` — Atomic execution units
 Skills are **single-purpose, composable instructions** used by workflows.
 
+```text
 skills/
 ├── discovery/
 │ └── summarize_discovery.md
