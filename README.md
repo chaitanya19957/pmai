@@ -14,12 +14,21 @@ This is a **Claude Code–first PM agent**, designed to move from reactive chat 
 
 ## Mental Model
 
-This system follows four layers:
+This system follows four execution layers:
 
-1. **Skills** — how work is executed
-2. **Context** — standards, voice, and templates
-3. **History** — durable memory of decisions and outputs
-4. **Automation / Tools** — integrations and triggers
+1. **Skills — atomic capabilities**  
+   Reusable, single-purpose instructions that define *what* the PM agent can do.  
+   Skills do not manage sequencing or invoke tools directly.
+2. **Workflows — process orchestration**  
+   Ordered compositions of skills that define *how* work gets done end-to-end.
+3. **Context — persistent standards**  
+   Templates, writing rules, and preferences that shape outputs consistently.
+4. **History — durable memory**  
+   Append-only record of decisions, outputs, patterns, and learnings.
+5. **Tools — external system contracts**  
+   Declarative interfaces (MCP-ready) that define how the agent can talk to Jira, Slack, etc.
+6. **Automation — triggers and runners**  
+   Scripts and events that decide *when* workflows execute.
 
 Everything is versioned, inspectable, and repeatable.
 
@@ -169,6 +178,8 @@ Next: event-driven execution (Jira, Slack, GitHub, Calendar)
 
 
 4. Decisions and learnings are committed to Git.
+
+Claude Code is the execution engine: it loads context, runs workflows, invokes tools via contracts, and writes results to history.
 
 ---
 
