@@ -13,7 +13,7 @@ Send a notification to Slack about workflow status or project updates.
 ## Reads
 - context/preferences/voice.md (for tone)
 
-## Tools (MCP)
+## MCP
 - slack.post_message(channel, text)
 
 ## Steps
