@@ -2,3 +2,10 @@
 **/.DS_Store
 .env
 .mcp.json
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# PDF (not part of repo)
+*.pdf
