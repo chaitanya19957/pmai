@@ -154,8 +154,8 @@ app.post('/slack/events', async (req, res) => {
       slack
     });
 
-    // Post results with improved formatting
-    const resultMsg = formatWorkflowResult(result, command, WORKFLOWS);
+    // Post results - minimal output
+    const resultMsg = formatWorkflowResult(result, command);
 
     console.log('Result:', resultMsg);
 
@@ -182,78 +182,55 @@ app.post('/slack/events', async (req, res) => {
 });
 
 /**
- * Format workflow result for Slack
+ * Format workflow result for Slack - minimal output
  */
-function formatWorkflowResult(result, command, workflows) {
-  const statusEmoji = result.status === 'SUCCESS' ? ':white_check_mark:' : ':x:';
+function formatWorkflowResult(result, command) {
+  if (result.status !== 'SUCCESS') {
+    return `:x: *${command.workflowName}* failed: ${result.summary}`;
+  }
 
-  // Find the main artifact (PRD, stories, etc.)
-  const prdArtifact = result.artifacts.find(a => a.includes('/prd/'));
-  const storiesArtifact = result.artifacts.find(a => a.includes('/stories/'));
+  // Get the main output based on workflow type
+  const mainOutput = getMainOutput(command.workflowName, result.artifacts);
+  const nextStep = getNextStep(command.workflowName, result.projectId);
 
-  // Build clean artifact list
-  const keyArtifacts = result.artifacts
-    .filter(a => !a.includes('claude_output') && !a.includes('claude_prompt'))
-    .map(a => `• \`${a}\``)
-    .join('\n');
+  let msg = `:white_check_mark: *${command.workflowName}* done\n\n`;
+  msg += `*Output:* \`${mainOutput}\`\n\n`;
+  msg += `Review and update before proceeding.`;
 
-  // Workflow-specific recommendations
-  const recommendations = getWorkflowRecommendations(command.workflowName, result.projectId);
-
-  // Next step suggestion
-  const nextCommand = getNextCommand(command.workflowName, result.projectId);
-
-  let msg = `${statusEmoji} *${command.workflowName}* completed\n\n`;
-
-  if (result.status === 'SUCCESS') {
-    msg += `*Project:* \`${result.projectId}\`\n\n`;
-
-    if (keyArtifacts) {
-      msg += `*Artifacts:*\n${keyArtifacts}\n\n`;
-    }
-
-    if (recommendations) {
-      msg += `*Recommended:*\n${recommendations}\n\n`;
-    }
-
-    if (nextCommand) {
-      msg += `*Next step:*\n\`${nextCommand}\``;
-    }
-  } else {
-    msg += `*Error:* ${result.summary}`;
+  if (nextStep) {
+    msg += `\n\n*Next:* \`${nextStep}\``;
   }
 
   return msg;
 }
 
 /**
- * Get workflow-specific recommendations
+ * Get the main output file for a workflow
  */
-function getWorkflowRecommendations(workflowName, projectId) {
-  const recommendations = {
-    'discovery_to_prd': [
-      ':eyes: Review the generated PRD for accuracy',
-      ':pencil: Update open questions and assumptions',
-      ':white_check_mark: Approve PRD before generating stories'
-    ].join('\n'),
-    'prd_to_stories': [
-      ':eyes: Review generated user stories',
-      ':pencil: Refine acceptance criteria as needed',
-      ':clipboard: Import stories to Jira when ready'
-    ].join('\n')
+function getMainOutput(workflowName, artifacts) {
+  const outputPatterns = {
+    'discovery_to_prd': '/prd/',
+    'prd_to_stories': '/stories/'
   };
-  return recommendations[workflowName] || null;
+
+  const pattern = outputPatterns[workflowName];
+  if (pattern) {
+    const match = artifacts.find(a => a.includes(pattern));
+    if (match) return match;
+  }
+
+  return artifacts[0] || 'No output';
 }
 
 /**
- * Get suggested next command based on workflow
+ * Get next step command
  */
-function getNextCommand(workflowName, projectId) {
-  const nextMap = {
-    'discovery_to_prd': `pmai run prd_to_stories --project_id=${projectId || '<project_id>'}`,
+function getNextStep(workflowName, projectId) {
+  const steps = {
+    'discovery_to_prd': `pmai run prd_to_stories --project_id=${projectId}`,
     'prd_to_stories': null
   };
-  return nextMap[workflowName] || null;
+  return steps[workflowName];
 }
 
 app.listen(PORT, () => {

@@ -190,30 +190,12 @@ async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threa
  */
 function buildClaudePrompt(workflowName, workflowContent, args, projectId, runDir) {
   const argsStr = Object.entries(args)
-    .map(([k, v]) => `- ${k}: ${v}`)
-    .join('\n');
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(', ');
 
-  return `Execute the following PMAI workflow.
-
-## Workflow: ${workflowName}
-
-${workflowContent}
-
-## Inputs
-- project_id: ${projectId}
-${argsStr}
-
-## Instructions
-1. Follow the workflow steps exactly as specified
-2. Write all outputs to: ${runDir}
-3. Use the project structure:
-   - inputs/ for input artifacts
-   - artifacts/ for intermediate artifacts
-   - prd/ for PRD documents
-   - stories/ for story documents
-4. Return a brief summary of what was accomplished
-
-Start executing now.`;
+  return `Run workflow: ${workflowName}
+Inputs: project_id=${projectId}, ${argsStr}
+Output to: ${runDir}`;
 }
 
 /**
