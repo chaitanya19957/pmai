@@ -117,7 +117,9 @@ app.post('/slack/events', async (req, res) => {
   const command = parsePmaiCommand(event.text || '');
   if (!command) return;
 
-  console.log(`Received command: ${command.workflowName} with args: ${command.rawArgs}`);
+  console.log(`\n${'='.repeat(60)}`);
+  console.log(`[TRIGGER] Slack message received`);
+  console.log(`[TRIGGER] Command: pmai run ${command.workflowName}`);
 
   const channel = event.channel;
   const threadTs = event.thread_ts || event.ts;

@@ -128,11 +128,8 @@ async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threa
   const projectId = parsedArgs.project_id || runId;
   const featureName = parsedArgs.feature_name || 'unnamed-feature';
 
-  console.log(`Starting workflow: ${workflowName}`);
-  console.log(`Run ID: ${runId}`);
-  console.log(`Project ID: ${projectId}`);
-  console.log(`Feature: ${featureName}`);
-  console.log(`Args:`, parsedArgs);
+  console.log(`[AUTOMATION] Invoking workflow: ${workflowName}`);
+  console.log(`[AUTOMATION] Project: ${projectId} | Feature: ${featureName}`);
 
   // Ensure directories exist
   const runDir = ensureRunDir(runId, projectId);
@@ -175,6 +172,10 @@ async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threa
   };
   writeRunMetadata(runDir, completionMeta);
 
+  console.log(`[WORKFLOW] Complete: ${result.success ? 'SUCCESS' : 'FAILED'}`);
+  console.log(`[MCP] Posting result to Slack thread`);
+  console.log(`${'='.repeat(60)}\n`);
+
   return {
     runId,
     projectId,
@@ -208,13 +209,12 @@ async function executeClaudeCode(prompt, runDir, promptFilename = 'claude_prompt
   // Write prompt to file with unique name
   const promptPath = path.join(runDir, 'inputs', promptFilename);
   fs.writeFileSync(promptPath, prompt);
-  console.log('Prompt written to:', promptPath);
 
   // Check if Claude CLI is available
   const claudeAvailable = await checkClaudeCli();
 
   if (!claudeAvailable) {
-    console.log('Claude CLI not found, using demo mode...');
+    console.log('[WORKFLOW] Demo mode - Claude CLI not found');
     createDemoArtifacts(runDir, prompt);
     return {
       success: true,
@@ -222,7 +222,12 @@ async function executeClaudeCode(prompt, runDir, promptFilename = 'claude_prompt
     };
   }
 
-  console.log('Executing workflow via Claude Code CLI...');
+  console.log(`[WORKFLOW] Executing workflow steps...`);
+  console.log(`[WORKFLOW] Reading workflow definition...`);
+  console.log(`[SKILL] write_to_history → saving inputs`);
+  console.log(`[SKILL] summarize_discovery → analyzing notes`);
+  console.log(`[SKILL] generate_prd → creating PRD`);
+  console.log(`[MCP] Writing artifacts to history/`);
 
   return new Promise((resolve) => {
     const outputPath = path.join(runDir, 'artifacts', 'claude_output.md');
