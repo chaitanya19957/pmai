@@ -13,7 +13,6 @@ history/projects/<project_id>/
 
 history/decisions/   -> global decisions (architecture, conventions)
 history/patterns/    -> reusable patterns discovered over time
-history/learnings/   -> retrospectives, post-launch learnings
 
 ## Naming
 - Use ISO dates when helpful: YYYY-MM-DD
