@@ -190,11 +190,15 @@ async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threa
  */
 function buildClaudePrompt(workflowName, workflowContent, args, projectId, runDir) {
   const argsStr = Object.entries(args)
-    .map(([k, v]) => `${k}: ${v}`)
-    .join(', ');
+    .map(([k, v]) => `- ${k}: ${v}`)
+    .join('\n');
 
-  return `Run workflow: ${workflowName}
-Inputs: project_id=${projectId}, ${argsStr}
+  return `Execute workflow: workflows/*_${workflowName}.md
+
+Inputs:
+- project_id: ${projectId}
+${argsStr}
+
 Output to: ${runDir}`;
 }
 
