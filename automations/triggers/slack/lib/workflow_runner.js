@@ -156,10 +156,9 @@ async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threa
   // Build prompt for Claude Code
   const prompt = buildClaudePrompt(workflowName, workflowContent, parsedArgs, projectId, runDir);
 
-  // Generate unique prompt filename with feature name and timestamp
-  const timestamp = runId.split('-').slice(-2).join('-'); // Extract timestamp from runId
+  // Simple filename: <feature>_<workflow>.md
   const safeFeatureName = sanitizeForFilename(featureName);
-  const promptFilename = `claude_prompt_${safeFeatureName}_${timestamp}.md`;
+  const promptFilename = `${safeFeatureName}_${workflowName}.md`;
 
   // Execute via Claude Code CLI
   const result = await executeClaudeCode(prompt, runDir, promptFilename);
