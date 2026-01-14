@@ -108,16 +108,30 @@ function readWorkflowContent(workflowPath) {
 }
 
 /**
+ * Sanitize string for use in filenames
+ */
+function sanitizeForFilename(str) {
+  if (!str) return 'unnamed';
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')  // Replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, '')      // Trim leading/trailing hyphens
+    .slice(0, 50);                 // Limit length
+}
+
+/**
  * Execute workflow using Claude Code CLI
  */
 async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threadTs, userId, slack }) {
   const runId = generateRunId(workflowName);
   const parsedArgs = parseArgs(rawArgs);
   const projectId = parsedArgs.project_id || runId;
+  const featureName = parsedArgs.feature_name || 'unnamed-feature';
 
   console.log(`Starting workflow: ${workflowName}`);
   console.log(`Run ID: ${runId}`);
   console.log(`Project ID: ${projectId}`);
+  console.log(`Feature: ${featureName}`);
   console.log(`Args:`, parsedArgs);
 
   // Ensure directories exist
@@ -128,6 +142,7 @@ async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threa
     runId,
     workflowName,
     projectId,
+    featureName,
     rawArgs,
     parsedArgs,
     slack: { channel, threadTs, userId },
@@ -141,8 +156,13 @@ async function runWorkflow({ workflowName, workflowPath, rawArgs, channel, threa
   // Build prompt for Claude Code
   const prompt = buildClaudePrompt(workflowName, workflowContent, parsedArgs, projectId, runDir);
 
+  // Generate unique prompt filename with feature name and timestamp
+  const timestamp = runId.split('-').slice(-2).join('-'); // Extract timestamp from runId
+  const safeFeatureName = sanitizeForFilename(featureName);
+  const promptFilename = `claude_prompt_${safeFeatureName}_${timestamp}.md`;
+
   // Execute via Claude Code CLI
-  const result = await executeClaudeCode(prompt, runDir);
+  const result = await executeClaudeCode(prompt, runDir, promptFilename);
 
   // Collect artifacts
   const artifacts = collectArtifacts(runDir);
@@ -199,9 +219,9 @@ Start executing now.`;
 /**
  * Execute Claude Code CLI
  */
-async function executeClaudeCode(prompt, runDir) {
-  // Write prompt to file
-  const promptPath = path.join(runDir, 'inputs', 'claude_prompt.md');
+async function executeClaudeCode(prompt, runDir, promptFilename = 'claude_prompt.md') {
+  // Write prompt to file with unique name
+  const promptPath = path.join(runDir, 'inputs', promptFilename);
   fs.writeFileSync(promptPath, prompt);
   console.log('Prompt written to:', promptPath);
 
@@ -224,8 +244,7 @@ async function executeClaudeCode(prompt, runDir) {
     let stdout = '';
     let stderr = '';
 
-    // Use shell to pipe prompt file to claude
-    const promptPath = path.join(runDir, 'inputs', 'claude_prompt.md');
+    // Use shell to pipe prompt file to claude (promptPath already defined above)
     const claude = spawn('sh', ['-c', `cat "${promptPath}" | claude -p --allowedTools "Read,Write,Edit,Glob,Grep,Bash"`], {
       cwd: REPO_ROOT,
       env: { ...process.env }

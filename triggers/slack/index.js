@@ -154,19 +154,8 @@ app.post('/slack/events', async (req, res) => {
       slack
     });
 
-    // Post results
-    const artifactList = result.artifacts.length > 0
-      ? result.artifacts.map(a => `  - \`${a}\``).join('\n')
-      : '  (none)';
-
-    const statusEmoji = result.status === 'SUCCESS' ? '' : '';
-    const nextCommand = getNextCommand(command.workflowName);
-
-    const resultMsg = `${statusEmoji} *${result.status}* — \`${command.workflowName}\`\n\n` +
-      `*Summary:*\n${result.summary}\n\n` +
-      `*Artifacts:*\n${artifactList}\n\n` +
-      `*Run ID:* \`${result.runId}\`\n` +
-      (nextCommand ? `*Next:* \`pmai run ${nextCommand}\`` : '');
+    // Post results with improved formatting
+    const resultMsg = formatWorkflowResult(result, command, WORKFLOWS);
 
     console.log('Result:', resultMsg);
 
@@ -193,11 +182,75 @@ app.post('/slack/events', async (req, res) => {
 });
 
 /**
+ * Format workflow result for Slack
+ */
+function formatWorkflowResult(result, command, workflows) {
+  const statusEmoji = result.status === 'SUCCESS' ? ':white_check_mark:' : ':x:';
+
+  // Find the main artifact (PRD, stories, etc.)
+  const prdArtifact = result.artifacts.find(a => a.includes('/prd/'));
+  const storiesArtifact = result.artifacts.find(a => a.includes('/stories/'));
+
+  // Build clean artifact list
+  const keyArtifacts = result.artifacts
+    .filter(a => !a.includes('claude_output') && !a.includes('claude_prompt'))
+    .map(a => `• \`${a}\``)
+    .join('\n');
+
+  // Workflow-specific recommendations
+  const recommendations = getWorkflowRecommendations(command.workflowName, result.projectId);
+
+  // Next step suggestion
+  const nextCommand = getNextCommand(command.workflowName, result.projectId);
+
+  let msg = `${statusEmoji} *${command.workflowName}* completed\n\n`;
+
+  if (result.status === 'SUCCESS') {
+    msg += `*Project:* \`${result.projectId}\`\n\n`;
+
+    if (keyArtifacts) {
+      msg += `*Artifacts:*\n${keyArtifacts}\n\n`;
+    }
+
+    if (recommendations) {
+      msg += `*Recommended:*\n${recommendations}\n\n`;
+    }
+
+    if (nextCommand) {
+      msg += `*Next step:*\n\`${nextCommand}\``;
+    }
+  } else {
+    msg += `*Error:* ${result.summary}`;
+  }
+
+  return msg;
+}
+
+/**
+ * Get workflow-specific recommendations
+ */
+function getWorkflowRecommendations(workflowName, projectId) {
+  const recommendations = {
+    'discovery_to_prd': [
+      ':eyes: Review the generated PRD for accuracy',
+      ':pencil: Update open questions and assumptions',
+      ':white_check_mark: Approve PRD before generating stories'
+    ].join('\n'),
+    'prd_to_stories': [
+      ':eyes: Review generated user stories',
+      ':pencil: Refine acceptance criteria as needed',
+      ':clipboard: Import stories to Jira when ready'
+    ].join('\n')
+  };
+  return recommendations[workflowName] || null;
+}
+
+/**
  * Get suggested next command based on workflow
  */
-function getNextCommand(workflowName) {
+function getNextCommand(workflowName, projectId) {
   const nextMap = {
-    'discovery_to_prd': 'prd_to_stories',
+    'discovery_to_prd': `pmai run prd_to_stories --project_id=${projectId || '<project_id>'}`,
     'prd_to_stories': null
   };
   return nextMap[workflowName] || null;
