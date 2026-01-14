@@ -59,7 +59,8 @@ function parseArgs(rawArgs) {
   const args = {};
 
   // Match --key=value or --key="value with spaces"
-  const regex = /--(\w+)=(?:"([^"]+)"|(\S+))/g;
+  // Also handles optional whitespace after = (e.g., --key= value)
+  const regex = /--(\w+)=\s*(?:"([^"]+)"|(\S+))/g;
   let match;
 
   while ((match = regex.exec(rawArgs)) !== null) {
@@ -204,15 +205,90 @@ async function executeClaudeCode(prompt, runDir) {
   fs.writeFileSync(promptPath, prompt);
   console.log('Prompt written to:', promptPath);
 
-  // For now, always use demo mode (creates placeholder artifacts)
-  // TODO: Add Claude CLI integration when available
-  console.log('Creating demo artifacts...');
-  createDemoArtifacts(runDir, prompt);
+  // Check if Claude CLI is available
+  const claudeAvailable = await checkClaudeCli();
 
-  return {
-    success: true,
-    summary: 'Demo mode: Placeholder artifacts created. Run workflow manually with Claude for full execution.'
-  };
+  if (!claudeAvailable) {
+    console.log('Claude CLI not found, using demo mode...');
+    createDemoArtifacts(runDir, prompt);
+    return {
+      success: true,
+      summary: 'Demo mode: Claude CLI not found. Install with: npm install -g @anthropic-ai/claude-code'
+    };
+  }
+
+  console.log('Executing workflow via Claude Code CLI...');
+
+  return new Promise((resolve) => {
+    const outputPath = path.join(runDir, 'artifacts', 'claude_output.md');
+    let stdout = '';
+    let stderr = '';
+
+    // Use shell to pipe prompt file to claude
+    const promptPath = path.join(runDir, 'inputs', 'claude_prompt.md');
+    const claude = spawn('sh', ['-c', `cat "${promptPath}" | claude -p --allowedTools "Read,Write,Edit,Glob,Grep,Bash"`], {
+      cwd: REPO_ROOT,
+      env: { ...process.env }
+    });
+
+    claude.stdout.on('data', (data) => {
+      const text = data.toString();
+      stdout += text;
+      process.stdout.write(text); // Stream to console
+    });
+
+    claude.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    claude.on('error', (err) => {
+      console.error('Claude CLI error:', err.message);
+      fs.writeFileSync(outputPath, `# Error\n\n${err.message}\n\n# Stderr\n${stderr}`);
+      resolve({
+        success: false,
+        summary: `Claude CLI error: ${err.message}`
+      });
+    });
+
+    claude.on('close', (code) => {
+      // Write output to history
+      fs.writeFileSync(outputPath, stdout || 'No output captured');
+
+      if (code === 0) {
+        resolve({
+          success: true,
+          summary: extractSummary(stdout) || 'Workflow completed successfully'
+        });
+      } else {
+        resolve({
+          success: false,
+          summary: `Workflow failed with exit code ${code}`
+        });
+      }
+    });
+
+    // Timeout after 10 minutes
+    setTimeout(() => {
+      console.log('Workflow execution timed out');
+      claude.kill('SIGTERM');
+      resolve({
+        success: false,
+        summary: 'Workflow execution timed out after 10 minutes'
+      });
+    }, 600000);
+  });
+}
+
+/**
+ * Check if Claude CLI is available
+ */
+function checkClaudeCli() {
+  return new Promise((resolve) => {
+    const which = spawn('which', ['claude']);
+    which.on('close', (code) => resolve(code === 0));
+    which.on('error', () => resolve(false));
+    setTimeout(() => resolve(false), 3000);
+  });
 }
 
 /**
