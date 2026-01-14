@@ -1,6 +1,6 @@
 # Automations
 
-Scheduled or rule-based orchestration that trigger workflows.
+Automations listen to external events and trigger workflows.
 
 ## Rules
 - Automations trigger workflows only (never skills directly)
@@ -11,15 +11,35 @@ Scheduled or rule-based orchestration that trigger workflows.
 
 ```
 automations/
+├── triggers/           # Event listeners
+│   └── slack/          # Slack Events API listener
+│       ├── index.js
+│       ├── lib/
+│       │   ├── workflow_runner.js
+│       │   └── slack_poster.js
+│       └── package.json
 ├── scripts/            # Utility scripts
 └── README.md
 ```
 
-## Difference: Automations vs Triggers
+## Slack Trigger
 
-| Layer | Purpose | Examples |
-|-------|---------|----------|
-| **Triggers** | Listen for external events | Slack messages, webhooks, cron |
-| **Automations** | Schedule and orchestrate | Daily reports, batch processing |
+See `triggers/slack/README.md` for setup and usage.
 
-See `triggers/` for event-driven automation (Slack listener, etc.)
+### Quick Start
+```bash
+cd automations/triggers/slack
+npm install
+npm start
+```
+
+### Command Format
+```
+pmai run <workflow_name> [--arg=value ...]
+```
+
+### Examples
+```
+pmai run discovery_to_prd --project_id=my-feature --feature_name="User Auth"
+pmai run prd_to_stories --project_id=my-feature
+```
