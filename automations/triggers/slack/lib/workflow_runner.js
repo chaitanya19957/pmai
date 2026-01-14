@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 
-const REPO_ROOT = path.resolve(__dirname, '../../../');
+const REPO_ROOT = path.resolve(__dirname, '../../../../');
 const WORKFLOWS_DIR = path.join(REPO_ROOT, 'workflows');
 const HISTORY_DIR = path.join(REPO_ROOT, 'history');
 
